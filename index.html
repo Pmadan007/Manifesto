@@ -76,37 +76,56 @@
       color: white;
       text-align: center;
       padding: 2rem;
+      position: relative;
     }
 
     #stickman-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 3;
-  text-align: center;
-}
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      text-align: center;
+    }
 
-#stickman {
-  font-size: 4rem;
-  color: white;
-}
+    #stickman {
+      font-size: 4rem;
+      color: white;
+    }
 
-#speech-bubble {
-  background: white;
-  color: black;
-  padding: 0.5rem 1rem;
-  border-radius: 10px;
-  display: inline-block;
-  margin-top: 1rem;
-  font-size: 1rem;
-  animation: popIn 0.3s ease;
-}
+    #speech-bubble {
+      background: white;
+      color: black;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      display: inline-block;
+      margin-top: 1rem;
+      font-size: 1rem;
+      animation: popIn 0.3s ease;
+    }
 
-@keyframes popIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
+    #siren-overlay {
+      display: none;
+    }
+
+    @keyframes flashSiren {
+      0% { background: rgba(255,0,0,0.2); }
+      50% { background: rgba(255,0,0,0.9); }
+      100% { background: rgba(255,0,0,0.2); }
+    }
+
+    .enemy {
+      position: absolute;
+      font-size: 2rem;
+      cursor: pointer;
+      color: white;
+      user-select: none;
+    }
+
+    #dialogue {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+    }
   </style>
 </head>
 <body>
@@ -119,15 +138,15 @@
   <!-- TERMINAL SCREEN -->
   <div id="terminal"></div>
 
-  <!-- GAME SCREEN (to be filled in Step 2) -->
+  <!-- GAME SCREEN -->
   <div id="game-screen">
-  <div id="siren-overlay"></div>
-  <div id="stickman-container">
-    <div id="stickman">|O|</div>
-    <div id="speech-bubble">Hi, I'm Pranjal.</div>
-  </div>
-  <div id="enemies"></div>
-  <div id="dialogue" style="display:none;">Where was I? Oh right…</div>
+    <div id="siren-overlay"></div>
+    <div id="stickman-container">
+      <div id="stickman">|O|</div>
+      <div id="speech-bubble">Hi, I'm Pranjal.</div>
+    </div>
+    <div id="enemies"></div>
+    <div id="dialogue" style="display:none;">Where was I? Oh right…</div>
   </div>
 
   <!-- TYPE SOUND -->
@@ -173,49 +192,59 @@
       } else {
         setTimeout(() => {
           terminal.style.display = "none";
+          gameScreen.style.display = "block";
           setTimeout(() => {
-  showSirenAndStartGame();
-}, 1800); // give ~1.8s for "Hi, I'm Pranjal"
-          function showSirenAndStartGame() {
-  // Hide speech bubble
-  document.getElementById("speech-bubble").style.display = "none";
-
-  // Flash siren
-  const siren = document.getElementById("siren-overlay");
-  siren.style.animation = "flashSiren 0.5s ease-in-out";
-
-  setTimeout(() => {
-    siren.style.display = "none";
-    spawnEnemies();
-  }, 600);
-}
-
-function spawnEnemies() {
-  const enemiesContainer = document.getElementById("enemies");
-  const dialogue = document.getElementById("dialogue");
-  let enemiesLeft = 11;
-
-  for (let i = 0; i < 11; i++) {
-    const enemy = document.createElement("div");
-    enemy.className = "enemy";
-    enemy.textContent = "??";
-    enemy.style.left = Math.random() * 80 + 10 + "%";
-    enemy.style.top = Math.random() * 70 + 10 + "%";
-    enemy.addEventListener("click", () => {
-      enemy.remove();
-      enemiesLeft--;
-      if (enemiesLeft === 0) {
-        dialogue.style.display = "block";
-        setTimeout(() => {
-          nextPhase(); // Placeholder for Step 3
-        }, 1500);
-      }
-    });
-    enemiesContainer.appendChild(enemy);
-  }
-}
+            showSirenAndStartGame();
+          }, 1800);
         }, 400);
       }
+    }
+
+    function showSirenAndStartGame() {
+      document.getElementById("speech-bubble").style.display = "none";
+
+      const siren = document.getElementById("siren-overlay");
+      siren.style.position = "fixed";
+      siren.style.inset = "0";
+      siren.style.background = "rgba(255, 0, 0, 0.8)";
+      siren.style.zIndex = "5";
+      siren.style.display = "block";
+      siren.style.animation = "flashSiren 0.5s ease-in-out";
+
+      setTimeout(() => {
+        siren.style.display = "none";
+        spawnEnemies();
+      }, 600);
+    }
+
+    function spawnEnemies() {
+      const enemiesContainer = document.getElementById("enemies");
+      const dialogue = document.getElementById("dialogue");
+      let enemiesLeft = 11;
+
+      for (let i = 0; i < 11; i++) {
+        const enemy = document.createElement("div");
+        enemy.className = "enemy";
+        enemy.textContent = "??";
+        enemy.style.left = Math.random() * 80 + 10 + "%";
+        enemy.style.top = Math.random() * 70 + 10 + "%";
+        enemy.addEventListener("click", () => {
+          enemy.remove();
+          enemiesLeft--;
+          if (enemiesLeft === 0) {
+            dialogue.style.display = "block";
+            setTimeout(() => {
+              nextPhase(); // Next step placeholder
+            }, 1500);
+          }
+        });
+        enemiesContainer.appendChild(enemy);
+      }
+    }
+
+    function nextPhase() {
+      alert("Step 3 coming soon… (Manifesto reveal!)");
+      // Or replace with next animation/game logic
     }
   </script>
 </body>
