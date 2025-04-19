@@ -37,14 +37,14 @@
       ">> Booting NEST Election OS v2.5...",
       ">> Authenticating user: PRANJAL",
       ">> Loading core leadership modules...",
-      ">> Initializing Social Media Lead framework...",
+      ">> Installing 'Socials Lead' plugin...",
+      ">> Warning: Meme generator detected in system...",
       ">> Injecting Learnex Lead protocols...",
-      ">> Optimizing influence algorithm...",
+      ">> Optimizing charisma output...",
       ">> Launching PRANJAL.EXE..."
     ];
 
     const terminal = document.getElementById("terminal");
-    let lineIndex = 0;
 
     function typeLine(line, index) {
       let charIndex = 0;
@@ -55,14 +55,14 @@
           clearInterval(interval);
           terminal.innerHTML += "\n";
           if (index + 1 < lines.length) {
-            setTimeout(() => typeLine(lines[index + 1], index + 1), 500);
+            setTimeout(() => typeLine(lines[index + 1], index + 1), 300);
           } else {
             setTimeout(() => {
-              window.location.href = "game.html"; // Next part
-            }, 2000);
+              window.location.href = "game.html"; // Next page
+            }, 1500);
           }
         }
-      }, 40);
+      }, 25); // Faster typing speed
     }
 
     typeLine(lines[0], 0);
