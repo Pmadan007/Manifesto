@@ -1,65 +1,70 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pranjal Campaign</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stickman Game</title>
   <style>
     body {
-      background-color: #fff;
-      font-family: monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
       margin: 0;
-    }.sprite {
-  background-image: url('spritesheet.png');
-  background-repeat: no-repeat;
-  display: inline-block;
-  margin: 20px;
-}
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: monospace;
+    }
 
-.big-stickman {
-  width: 150px;
-  height: 200px;
-  background-position: -50px -50px;
-}
+    .sprite {
+      width: 250px;
+      height: 250px;
+      background-image: url("spritesheet.png");
+      background-repeat: no-repeat;
+      image-rendering: pixelated;
+      animation: walkAnim 1s steps(2) infinite;
+    }
 
-.speech-hi {
-  width: 350px;
-  height: 120px;
-  background-position: -550px -50px;
-}
+    @keyframes walkAnim {
+      0% { background-position: 0 0; }
+      100% { background-position: -500px 0; } /* Two walking frames */
+    }
 
-.speech-where {
-  width: 350px;
-  height: 130px;
-  background-position: -550px -400px;
-}
+    /* Extra classes for using other frames */
 
-.manifesto-box {
-  width: 500px;
-  height: 180px;
-  background-position: -450px -850px;
-}
+    .talking {
+      background-position: -250px 0; /* 2nd frame */
+    }
 
-.explosion {
-  width: 120px;
-  height: 120px;
-  animation: explode 0.6s steps(3) infinite;
-}
+    .smallWalk {
+      background-position: -750px 0; /* 3rd frame */
+    }
 
-@keyframes explode {
-  0% { background-position: -150px -1250px; }
-  33% { background-position: -400px -1250px; }
-  66% { background-position: -650px -1300px; }
-}
+    .speech1 {
+      background-position: -500px 250px; /* "Hi I'm Pranjal" with big char */
+    }
 
+    .speech2 {
+      background-position: 0px 500px; /* "Contesting for Socials and Learnex" */
+    }
+
+    .crow1 {
+      background-position: 0px 750px;
+    }
+
+    .crow2 {
+      background-position: -250px 750px;
+    }
+
+    .poof1 {
+      background-position: -500px 750px;
+    }
+
+    .poof2 {
+      background-position: -750px 750px;
+    }
   </style>
 </head>
 <body>
-  <!-- Scene 1: Big stickman waving -->
-  <div class="sprite big-stickman"></div>  <!-- Scene 2: Speech bubble Hi I’m Pranjal -->  <div class="sprite speech-hi"></div>  <!-- Scene 3: Where were we... -->  <div class="sprite speech-where"></div>  <!-- Scene 4: Manifesto intro -->  <div class="sprite manifesto-box"></div>  <!-- Scene 5: Explosion effect -->  <div class="sprite explosion"></div>
+  <div class="sprite"></div>
 </body>
 </html>
