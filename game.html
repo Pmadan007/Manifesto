@@ -1,158 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Game - Pranjal</title>
+  <title>Pranjal Game</title>
   <style>
     body {
       margin: 0;
       background: black;
       overflow: hidden;
-      font-family: sans-serif;
     }
-
-    #stickman-container {
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: #111;
+    }
+    #speech {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 3;
-      text-align: center;
-      color: white;
-    }
-
-    #stickman {
-      font-size: 4rem;
-    }
-
-    #speech-bubble {
-      background: white;
-      color: black;
-      padding: 0.5rem 1rem;
-      border-radius: 10px;
-      display: inline-block;
-      margin-top: 1rem;
-      font-size: 1rem;
-      animation: fadeIn 0.4s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    #siren-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(255, 0, 0, 0.7);
-      z-index: 100;
-      animation: sirenFlash 0.4s ease-in-out;
-    }
-
-    @keyframes sirenFlash {
-      0% { opacity: 0; }
-      50% { opacity: 1; }
-      100% { opacity: 0; }
-    }
-
-    #enemies {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-
-    .enemy {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      background: white;
-      color: black;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      cursor: pointer;
-      pointer-events: all;
-      animation: popEnemy 0.3s ease;
-    }
-
-    @keyframes popEnemy {
-      from { transform: scale(0); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    #dialogue {
-      position: absolute;
-      bottom: 10%;
+      bottom: 120px;
       left: 50%;
       transform: translateX(-50%);
       background: white;
       color: black;
-      padding: 0.6rem 1.2rem;
-      font-size: 1rem;
-      border-radius: 8px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-family: monospace;
+      font-size: 14px;
       display: none;
-      z-index: 10;
+      animation: pop 0.3s ease;
+    }
+    @keyframes pop {
+      from { transform: scale(0.8) translateX(-50%); opacity: 0; }
+      to { transform: scale(1) translateX(-50%); opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <div id="siren-overlay" style="display: none;"></div>
-
-  <div id="stickman-container">
-    <div id="stickman">|O|</div>
-    <div id="speech-bubble">Hi, I’m Pranjal.</div>
-  </div>
-
-  <div id="enemies"></div>
-  <div id="dialogue">Where was I? Oh right…</div>
+  <canvas id="gameCanvas" width="360" height="640"></canvas>
+  <div id="speech">Hi, I’m Pranjal.</div>
 
   <script>
-    // Step 1: Siren flashes after 1.8s
-    setTimeout(() => {
-      document.getElementById("speech-bubble").style.display = "none";
-      const siren = document.getElementById("siren-overlay");
-      siren.style.display = "block";
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const sprite = new Image();
+    sprite.src = 'spritesheet.png'; // Your uploaded sheet
 
-      setTimeout(() => {
-        siren.style.display = "none";
-        spawnEnemies();
-      }, 600);
-    }, 1800);
+    const stickman = {
+      x: 160,
+      y: 500,
+      frame: 0
+    };
 
-    // Step 2: Enemies appear
-    function spawnEnemies() {
-      const enemiesContainer = document.getElementById("enemies");
-      const dialogue = document.getElementById("dialogue");
-      let enemiesLeft = 11;
+    let speechStep = 0;
+    const speechText = [
+      "Hi, I'm Pranjal.",
+      "Where were we…",
+      "Ah yes!",
+      "Hi again, I'm Pranjal,",
+      "Contesting for Socials and Learnex Lead."
+    ];
 
-      for (let i = 0; i < 11; i++) {
-        const enemy = document.createElement("div");
-        enemy.className = "enemy";
-        enemy.textContent = "??";
+    const crows = [];
+    const poofs = [];
 
-        const x = Math.random() * 80 + 10;
-        const y = Math.random() * 70 + 10;
+    let frameCount = 0;
+    let defeated = 0;
+    let gameEnded = false;
 
-        enemy.style.left = `${x}%`;
-        enemy.style.top = `${y}%`;
+    function drawStickman() {
+      const frameX = stickman.frame % 2 === 0 ? 0 : 16;
+      ctx.drawImage(sprite, frameX, 0, 16, 16, stickman.x, stickman.y, 32, 32);
+    }
 
-        enemy.addEventListener("click", () => {
-          enemy.remove();
-          enemiesLeft--;
-          if (enemiesLeft === 0) {
-            setTimeout(() => {
-              dialogue.style.display = "block";
-              // Proceed to next step (add manifest reveal next)
-            }, 500);
+    function drawSpeech(text) {
+      const speech = document.getElementById('speech');
+      speech.innerText = text;
+      speech.style.display = 'block';
+    }
+
+    function drawCrows() {
+      crows.forEach(crow => {
+        const fx = crow.frameIndex === 0 ? 0 : 16;
+        ctx.drawImage(sprite, fx, 48, 16, 16, crow.x, crow.y, 24, 24);
+      });
+    }
+
+    function drawPoofs() {
+      poofs.forEach(poof => {
+        ctx.drawImage(sprite, 0, 64, 16, 16, poof.x, poof.y, 24, 24);
+      });
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Animate stickman
+      if (!gameEnded) {
+        if (frameCount % 15 === 0) stickman.frame++;
+      }
+
+      drawStickman();
+      drawCrows();
+      drawPoofs();
+
+      // Animate crows
+      crows.forEach(crow => {
+        crow.frameIndex = frameCount % 30 < 15 ? 0 : 1;
+      });
+
+      // Remove poofs
+      if (frameCount % 20 === 0) {
+        poofs.splice(0, 1);
+      }
+
+      frameCount++;
+      requestAnimationFrame(gameLoop);
+    }
+
+    function showSpeechStep() {
+      if (speechStep < speechText.length) {
+        drawSpeech(speechText[speechStep]);
+        speechStep++;
+        setTimeout(() => {
+          document.getElementById('speech').style.display = 'none';
+          if (speechStep === 2) {
+            spawnCrows();
           }
-        });
-
-        enemiesContainer.appendChild(enemy);
+          if (speechStep < speechText.length) {
+            setTimeout(showSpeechStep, 1000);
+          } else {
+            setTimeout(() => {
+              window.location.href = "manifesto.html";
+            }, 1500);
+          }
+        }, 1500);
       }
     }
+
+    function spawnCrows() {
+      for (let i = 0; i < 11; i++) {
+        const x = Math.random() * 300 + 20;
+        const y = Math.random() * 300 + 20;
+        crows.push({ x, y, frameIndex: 0 });
+      }
+      canvas.addEventListener('click', handleClick);
+    }
+
+    function handleClick(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      for (let i = 0; i < crows.length; i++) {
+        const crow = crows[i];
+        if (
+          x >= crow.x && x <= crow.x + 24 &&
+          y >= crow.y && y <= crow.y + 24
+        ) {
+          poofs.push({ x: crow.x, y: crow.y });
+          crows.splice(i, 1);
+          defeated++;
+          if (defeated >= 11) {
+            canvas.removeEventListener('click', handleClick);
+            showSpeechStep(); // resumes dialogue
+          }
+          break;
+        }
+      }
+    }
+
+    sprite.onload = () => {
+      showSpeechStep(); // begins with "Hi I’m Pranjal"
+      gameLoop();
+    };
   </script>
 </body>
 </html>
