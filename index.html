@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pranjal Boot Sequence</title>
+  <style>
+    body {
+      background: black;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      padding: 2rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      overflow: hidden;
+    }
+    #terminal {
+      white-space: pre-wrap;
+    }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      background: #00ff00;
+      animation: blink 0.8s infinite;
+      height: 1rem;
+    }
+    @keyframes blink {
+      0%, 100% { background: #00ff00; }
+      50% { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="terminal"></div>
+  <script>
+    const lines = [
+      ">> Booting NEST Election OS v2.5...",
+      ">> Authenticating user: PRANJAL",
+      ">> Loading core leadership modules...",
+      ">> Initializing Social Media Lead framework...",
+      ">> Injecting Learnex Lead protocols...",
+      ">> Optimizing influence algorithm...",
+      ">> Launching PRANJAL.EXE..."
+    ];
+
+    const terminal = document.getElementById("terminal");
+    let lineIndex = 0;
+
+    function typeLine(line, index) {
+      let charIndex = 0;
+      const interval = setInterval(() => {
+        if (charIndex < line.length) {
+          terminal.innerHTML += line[charIndex++];
+        } else {
+          clearInterval(interval);
+          terminal.innerHTML += "\n";
+          if (index + 1 < lines.length) {
+            setTimeout(() => typeLine(lines[index + 1], index + 1), 500);
+          } else {
+            setTimeout(() => {
+              window.location.href = "game.html"; // Next part
+            }, 2000);
+          }
+        }
+      }, 40);
+    }
+
+    typeLine(lines[0], 0);
+  </script>
+</body>
+</html>
