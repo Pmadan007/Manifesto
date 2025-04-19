@@ -77,6 +77,36 @@
       text-align: center;
       padding: 2rem;
     }
+
+    #stickman-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  text-align: center;
+}
+
+#stickman {
+  font-size: 4rem;
+  color: white;
+}
+
+#speech-bubble {
+  background: white;
+  color: black;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 1rem;
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
   </style>
 </head>
 <body>
@@ -91,8 +121,13 @@
 
   <!-- GAME SCREEN (to be filled in Step 2) -->
   <div id="game-screen">
-    <h1>Next Phase Coming...</h1>
-    <p>This will be your stickman entrance, enemies, etc.</p>
+  <div id="siren-overlay"></div>
+  <div id="stickman-container">
+    <div id="stickman">|O|</div>
+    <div id="speech-bubble">Hi, I'm Pranjal.</div>
+  </div>
+  <div id="enemies"></div>
+  <div id="dialogue" style="display:none;">Where was I? Oh right…</div>
   </div>
 
   <!-- TYPE SOUND -->
@@ -138,7 +173,47 @@
       } else {
         setTimeout(() => {
           terminal.style.display = "none";
-          gameScreen.style.display = "block";
+          setTimeout(() => {
+  showSirenAndStartGame();
+}, 1800); // give ~1.8s for "Hi, I'm Pranjal"
+          function showSirenAndStartGame() {
+  // Hide speech bubble
+  document.getElementById("speech-bubble").style.display = "none";
+
+  // Flash siren
+  const siren = document.getElementById("siren-overlay");
+  siren.style.animation = "flashSiren 0.5s ease-in-out";
+
+  setTimeout(() => {
+    siren.style.display = "none";
+    spawnEnemies();
+  }, 600);
+}
+
+function spawnEnemies() {
+  const enemiesContainer = document.getElementById("enemies");
+  const dialogue = document.getElementById("dialogue");
+  let enemiesLeft = 11;
+
+  for (let i = 0; i < 11; i++) {
+    const enemy = document.createElement("div");
+    enemy.className = "enemy";
+    enemy.textContent = "??";
+    enemy.style.left = Math.random() * 80 + 10 + "%";
+    enemy.style.top = Math.random() * 70 + 10 + "%";
+    enemy.addEventListener("click", () => {
+      enemy.remove();
+      enemiesLeft--;
+      if (enemiesLeft === 0) {
+        dialogue.style.display = "block";
+        setTimeout(() => {
+          nextPhase(); // Placeholder for Step 3
+        }, 1500);
+      }
+    });
+    enemiesContainer.appendChild(enemy);
+  }
+}
         }, 400);
       }
     }
