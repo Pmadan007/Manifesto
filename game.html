@@ -1,178 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pranjal Game</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pranjal Campaign</title>
   <style>
     body {
-      margin: 0;
-      background: black;
-      overflow: hidden;
-    }
-    canvas {
-      display: block;
-      margin: 0 auto;
-      background: #111;
-    }
-    #speech {
-      position: absolute;
-      bottom: 120px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      color: black;
-      padding: 8px 14px;
-      border-radius: 12px;
+      background-color: #fff;
       font-family: monospace;
-      font-size: 14px;
-      display: none;
-      animation: pop 0.3s ease;
-    }
-    @keyframes pop {
-      from { transform: scale(0.8) translateX(-50%); opacity: 0; }
-      to { transform: scale(1) translateX(-50%); opacity: 1; }
-    }
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }.sprite {
+  background-image: url('spritesheet.png');
+  background-repeat: no-repeat;
+  display: inline-block;
+  margin: 20px;
+}
+
+.big-stickman {
+  width: 150px;
+  height: 200px;
+  background-position: -50px -50px;
+}
+
+.speech-hi {
+  width: 350px;
+  height: 120px;
+  background-position: -550px -50px;
+}
+
+.speech-where {
+  width: 350px;
+  height: 130px;
+  background-position: -550px -400px;
+}
+
+.manifesto-box {
+  width: 500px;
+  height: 180px;
+  background-position: -450px -850px;
+}
+
+.explosion {
+  width: 120px;
+  height: 120px;
+  animation: explode 0.6s steps(3) infinite;
+}
+
+@keyframes explode {
+  0% { background-position: -150px -1250px; }
+  33% { background-position: -400px -1250px; }
+  66% { background-position: -650px -1300px; }
+}
+
   </style>
 </head>
 <body>
-  <canvas id="gameCanvas" width="360" height="640"></canvas>
-  <div id="speech">Hi, I’m Pranjal.</div>
-
-  <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const sprite = new Image();
-    sprite.src = 'spritesheet.png'; // Your uploaded sheet
-
-    const stickman = {
-      x: 160,
-      y: 500,
-      frame: 0
-    };
-
-    let speechStep = 0;
-    const speechText = [
-      "Hi, I'm Pranjal.",
-      "Where were we…",
-      "Ah yes!",
-      "Hi again, I'm Pranjal,",
-      "Contesting for Socials and Learnex Lead."
-    ];
-
-    const crows = [];
-    const poofs = [];
-
-    let frameCount = 0;
-    let defeated = 0;
-    let gameEnded = false;
-
-    function drawStickman() {
-      const frameX = stickman.frame % 2 === 0 ? 0 : 16;
-      ctx.drawImage(sprite, frameX, 0, 16, 16, stickman.x, stickman.y, 32, 32);
-    }
-
-    function drawSpeech(text) {
-      const speech = document.getElementById('speech');
-      speech.innerText = text;
-      speech.style.display = 'block';
-    }
-
-    function drawCrows() {
-      crows.forEach(crow => {
-        const fx = crow.frameIndex === 0 ? 0 : 16;
-        ctx.drawImage(sprite, fx, 48, 16, 16, crow.x, crow.y, 24, 24);
-      });
-    }
-
-    function drawPoofs() {
-      poofs.forEach(poof => {
-        ctx.drawImage(sprite, 0, 64, 16, 16, poof.x, poof.y, 24, 24);
-      });
-    }
-
-    function gameLoop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Animate stickman
-      if (!gameEnded) {
-        if (frameCount % 15 === 0) stickman.frame++;
-      }
-
-      drawStickman();
-      drawCrows();
-      drawPoofs();
-
-      // Animate crows
-      crows.forEach(crow => {
-        crow.frameIndex = frameCount % 30 < 15 ? 0 : 1;
-      });
-
-      // Remove poofs
-      if (frameCount % 20 === 0) {
-        poofs.splice(0, 1);
-      }
-
-      frameCount++;
-      requestAnimationFrame(gameLoop);
-    }
-
-    function showSpeechStep() {
-      if (speechStep < speechText.length) {
-        drawSpeech(speechText[speechStep]);
-        speechStep++;
-        setTimeout(() => {
-          document.getElementById('speech').style.display = 'none';
-          if (speechStep === 2) {
-            spawnCrows();
-          }
-          if (speechStep < speechText.length) {
-            setTimeout(showSpeechStep, 1000);
-          } else {
-            setTimeout(() => {
-              window.location.href = "manifesto.html";
-            }, 1500);
-          }
-        }, 1500);
-      }
-    }
-
-    function spawnCrows() {
-      for (let i = 0; i < 11; i++) {
-        const x = Math.random() * 300 + 20;
-        const y = Math.random() * 300 + 20;
-        crows.push({ x, y, frameIndex: 0 });
-      }
-      canvas.addEventListener('click', handleClick);
-    }
-
-    function handleClick(e) {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      for (let i = 0; i < crows.length; i++) {
-        const crow = crows[i];
-        if (
-          x >= crow.x && x <= crow.x + 24 &&
-          y >= crow.y && y <= crow.y + 24
-        ) {
-          poofs.push({ x: crow.x, y: crow.y });
-          crows.splice(i, 1);
-          defeated++;
-          if (defeated >= 11) {
-            canvas.removeEventListener('click', handleClick);
-            showSpeechStep(); // resumes dialogue
-          }
-          break;
-        }
-      }
-    }
-
-    sprite.onload = () => {
-      showSpeechStep(); // begins with "Hi I’m Pranjal"
-      gameLoop();
-    };
-  </script>
+  <!-- Scene 1: Big stickman waving -->
+  <div class="sprite big-stickman"></div>  <!-- Scene 2: Speech bubble Hi I’m Pranjal -->  <div class="sprite speech-hi"></div>  <!-- Scene 3: Where were we... -->  <div class="sprite speech-where"></div>  <!-- Scene 4: Manifesto intro -->  <div class="sprite manifesto-box"></div>  <!-- Scene 5: Explosion effect -->  <div class="sprite explosion"></div>
 </body>
 </html>
