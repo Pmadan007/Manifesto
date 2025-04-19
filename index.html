@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pranjal Boot Sequence</title>
   <style>
@@ -26,16 +26,28 @@
     #tap-box {
       background: white;
       color: black;
-      padding: 1.5rem 2rem;
-      font-size: 1.2rem;
+      padding: 1.5rem 2.5rem;
+      font-size: 1.4rem;
       font-weight: bold;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: transform 0.2s;
+      box-shadow: 0 0 10px white;
+      transform: scale(0);
+      animation: popUp 0.5s ease-out 0.2s forwards;
     }
 
-    #tap-box:hover {
-      transform: scale(1.05);
+    @keyframes popUp {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      60% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+      }
     }
 
     #terminal {
@@ -44,6 +56,26 @@
       font-size: 1rem;
       line-height: 1.5;
       display: none;
+    }
+
+    .boot-line {
+      opacity: 0;
+      transform: scale(0.95);
+      animation: popIn 0.2s ease-out forwards;
+    }
+
+    @keyframes popIn {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    #game-screen {
+      display: none;
+      color: white;
+      text-align: center;
+      padding: 2rem;
     }
   </style>
 </head>
@@ -54,10 +86,16 @@
     <div id="tap-box">TAP TO START</div>
   </div>
 
-  <!-- TERMINAL -->
+  <!-- TERMINAL SCREEN -->
   <div id="terminal"></div>
 
-  <!-- SOUND -->
+  <!-- GAME SCREEN (to be filled in Step 2) -->
+  <div id="game-screen">
+    <h1>Next Phase Coming...</h1>
+    <p>This will be your stickman entrance, enemies, etc.</p>
+  </div>
+
+  <!-- TYPE SOUND -->
   <audio id="typeSound" src="s1.wav" preload="auto"></audio>
 
   <script>
@@ -72,40 +110,37 @@
       ">> Launching PRANJAL.EXE..."
     ];
 
-    const terminal = document.getElementById("terminal");
-    const sound = document.getElementById("typeSound");
     const tapScreen = document.getElementById("tap-screen");
     const tapBox = document.getElementById("tap-box");
+    const terminal = document.getElementById("terminal");
+    const gameScreen = document.getElementById("game-screen");
+    const sound = document.getElementById("typeSound");
 
     tapBox.addEventListener("click", () => {
       tapScreen.style.display = "none";
       terminal.style.display = "block";
-      typeLine(lines[0], 0);
+      typeLinesFast(0);
     });
 
     function playSound() {
       sound.currentTime = 0;
-      sound.play().catch(() => {}); // handles any silent fail
+      sound.play().catch(() => {});
     }
 
-    function typeLine(line, index) {
-      let charIndex = 0;
-      const interval = setInterval(() => {
-        if (charIndex < line.length) {
-          terminal.innerHTML += line[charIndex++];
-          playSound();
-        } else {
-          clearInterval(interval);
-          terminal.innerHTML += "\n";
-          if (index + 1 < lines.length) {
-            setTimeout(() => typeLine(lines[index + 1], index + 1), 300);
-          } else {
-            setTimeout(() => {
-              window.location.href = "game.html"; // Next step
-            }, 1500);
-          }
-        }
-      }, 25);
+    function typeLinesFast(index) {
+      if (index < lines.length) {
+        const line = document.createElement("div");
+        line.className = "boot-line";
+        line.textContent = lines[index];
+        terminal.appendChild(line);
+        playSound();
+        setTimeout(() => typeLinesFast(index + 1), 200);
+      } else {
+        setTimeout(() => {
+          terminal.style.display = "none";
+          gameScreen.style.display = "block";
+        }, 400);
+      }
     }
   </script>
 </body>
