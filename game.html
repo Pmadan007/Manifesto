@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Game - Pranjal</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    #stickman-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      text-align: center;
+      color: white;
+    }
+
+    #stickman {
+      font-size: 4rem;
+    }
+
+    #speech-bubble {
+      background: white;
+      color: black;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      display: inline-block;
+      margin-top: 1rem;
+      font-size: 1rem;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    #siren-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 0, 0, 0.7);
+      z-index: 100;
+      animation: sirenFlash 0.4s ease-in-out;
+    }
+
+    @keyframes sirenFlash {
+      0% { opacity: 0; }
+      50% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    #enemies {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .enemy {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: white;
+      color: black;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      pointer-events: all;
+      animation: popEnemy 0.3s ease;
+    }
+
+    @keyframes popEnemy {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    #dialogue {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      color: black;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      display: none;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="siren-overlay" style="display: none;"></div>
+
+  <div id="stickman-container">
+    <div id="stickman">|O|</div>
+    <div id="speech-bubble">Hi, I’m Pranjal.</div>
+  </div>
+
+  <div id="enemies"></div>
+  <div id="dialogue">Where was I? Oh right…</div>
+
+  <script>
+    // Step 1: Siren flashes after 1.8s
+    setTimeout(() => {
+      document.getElementById("speech-bubble").style.display = "none";
+      const siren = document.getElementById("siren-overlay");
+      siren.style.display = "block";
+
+      setTimeout(() => {
+        siren.style.display = "none";
+        spawnEnemies();
+      }, 600);
+    }, 1800);
+
+    // Step 2: Enemies appear
+    function spawnEnemies() {
+      const enemiesContainer = document.getElementById("enemies");
+      const dialogue = document.getElementById("dialogue");
+      let enemiesLeft = 11;
+
+      for (let i = 0; i < 11; i++) {
+        const enemy = document.createElement("div");
+        enemy.className = "enemy";
+        enemy.textContent = "??";
+
+        const x = Math.random() * 80 + 10;
+        const y = Math.random() * 70 + 10;
+
+        enemy.style.left = `${x}%`;
+        enemy.style.top = `${y}%`;
+
+        enemy.addEventListener("click", () => {
+          enemy.remove();
+          enemiesLeft--;
+          if (enemiesLeft === 0) {
+            setTimeout(() => {
+              dialogue.style.display = "block";
+              // Proceed to next step (add manifest reveal next)
+            }, 500);
+          }
+        });
+
+        enemiesContainer.appendChild(enemy);
+      }
+    }
+  </script>
+</body>
+</html>
