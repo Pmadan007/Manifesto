@@ -9,48 +9,91 @@
       background: black;
       color: #00ff00;
       font-family: 'Courier New', monospace;
-      padding: 2rem;
-      font-size: 1rem;
-      line-height: 1.5;
+      margin: 0;
       overflow: hidden;
     }
+
+    #tap-screen {
+      position: fixed;
+      inset: 0;
+      background: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    #tap-box {
+      background: white;
+      color: black;
+      padding: 1.5rem 2rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    #tap-box:hover {
+      transform: scale(1.05);
+    }
+
     #terminal {
+      padding: 2rem;
       white-space: pre-wrap;
-    }
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      background: #00ff00;
-      animation: blink 0.8s infinite;
-      height: 1rem;
-    }
-    @keyframes blink {
-      0%, 100% { background: #00ff00; }
-      50% { background: transparent; }
+      font-size: 1rem;
+      line-height: 1.5;
+      display: none;
     }
   </style>
 </head>
 <body>
+
+  <!-- TAP TO START SCREEN -->
+  <div id="tap-screen">
+    <div id="tap-box">TAP TO START</div>
+  </div>
+
+  <!-- TERMINAL -->
   <div id="terminal"></div>
+
+  <!-- SOUND -->
+  <audio id="typeSound" src="s1.wav" preload="auto"></audio>
+
   <script>
     const lines = [
       ">> Booting NEST Election OS v2.5...",
       ">> Authenticating user: PRANJAL",
       ">> Loading core leadership modules...",
       ">> Installing 'Socials Lead' plugin...",
-      ">> Warning: Meme generator detected in system...",
+      ">> Detected 11 background processes... all irrelevant.",
       ">> Injecting Learnex Lead protocols...",
       ">> Optimizing charisma output...",
       ">> Launching PRANJAL.EXE..."
     ];
 
     const terminal = document.getElementById("terminal");
+    const sound = document.getElementById("typeSound");
+    const tapScreen = document.getElementById("tap-screen");
+    const tapBox = document.getElementById("tap-box");
+
+    tapBox.addEventListener("click", () => {
+      tapScreen.style.display = "none";
+      terminal.style.display = "block";
+      typeLine(lines[0], 0);
+    });
+
+    function playSound() {
+      sound.currentTime = 0;
+      sound.play().catch(() => {}); // handles any silent fail
+    }
 
     function typeLine(line, index) {
       let charIndex = 0;
       const interval = setInterval(() => {
         if (charIndex < line.length) {
           terminal.innerHTML += line[charIndex++];
+          playSound();
         } else {
           clearInterval(interval);
           terminal.innerHTML += "\n";
@@ -58,14 +101,12 @@
             setTimeout(() => typeLine(lines[index + 1], index + 1), 300);
           } else {
             setTimeout(() => {
-              window.location.href = "game.html"; // Next page
+              window.location.href = "game.html"; // Next step
             }, 1500);
           }
         }
-      }, 25); // Faster typing speed
+      }, 25);
     }
-
-    typeLine(lines[0], 0);
   </script>
 </body>
 </html>
